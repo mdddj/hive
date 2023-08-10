@@ -1,3 +1,25 @@
+## 3.0.0
+- Upgrade Dependency
+```yaml
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  build: ^2.4.1
+  source_gen: ^1.4.0
+  hive: ^2.2.3
+  analyzer: ^6.1.0
+  source_helper: ^1.3.4
+
+dev_dependencies:
+  test: ^1.24.6
+  build_test: ^2.2.0
+  build_runner: ^2.4.6
+  pedantic: ^1.11.1
+ 
+```
+
 ## 2.0.0
 - Updated `analyzer` version constraints to `>=5.0.0`
 

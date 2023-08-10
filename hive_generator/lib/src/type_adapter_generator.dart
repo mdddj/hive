@@ -1,11 +1,12 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:build/build.dart';
 import 'package:hive/hive.dart';
-import 'package:hive_generator/src/builder.dart';
-import 'package:hive_generator/src/class_builder.dart';
-import 'package:hive_generator/src/enum_builder.dart';
-import 'package:hive_generator/src/helper.dart';
 import 'package:source_gen/source_gen.dart';
+
+import 'builder.dart';
+import 'class_builder.dart';
+import 'enum_builder.dart';
+import 'helper.dart';
 
 class TypeAdapterGenerator extends GeneratorForAnnotation<HiveType> {
   static String generateName(String typeName) {
@@ -78,7 +79,7 @@ class TypeAdapterGenerator extends GeneratorForAnnotation<HiveType> {
   Set<String> getAllAccessorNames(InterfaceElement interface) {
     var accessorNames = <String>{};
 
-    var supertypes = interface.allSupertypes.map((it) => it.element2);
+    var supertypes = interface.allSupertypes.map((it) => it.element);
     for (var type in [interface, ...supertypes]) {
       for (var accessor in type.accessors) {
         if (accessor.isSetter) {

@@ -1,6 +1,7 @@
 import 'package:analyzer/dart/element/element.dart';
-import 'package:hive_generator/src/builder.dart';
-import 'package:hive_generator/src/helper.dart';
+
+import 'builder.dart';
+import 'helper.dart';
 
 class EnumBuilder extends Builder {
   EnumBuilder(InterfaceElement interface, List<AdapterField> getters)

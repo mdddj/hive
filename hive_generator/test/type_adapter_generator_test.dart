@@ -1,4 +1,4 @@
-import 'package:hive_generator/src/type_adapter_generator.dart';
+import 'package:hive_generator_plus/src/type_adapter_generator.dart';
 import 'package:test/test.dart';
 
 void main() {

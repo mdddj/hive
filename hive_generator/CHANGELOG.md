@@ -1,3 +1,6 @@
+## 3.0.1
+- bug fixed
+
 ## 3.0.0
 - Upgrade Dependency
 ```yaml

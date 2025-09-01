@@ -36,7 +36,7 @@ class TypeAdapterGenerator extends GeneratorForAnnotation<HiveType> {
 
     var typeId = getTypeId(annotation);
 
-    var adapterName = getAdapterName(interface.name, annotation);
+    var adapterName = getAdapterName(interface.name ?? '', annotation);
     var builder = interface is EnumElement
         ? EnumBuilder(interface, getters)
         : ClassBuilder(interface, getters, setters);
@@ -81,12 +81,16 @@ class TypeAdapterGenerator extends GeneratorForAnnotation<HiveType> {
 
     var supertypes = interface.allSupertypes.map((it) => it.element);
     for (var type in [interface, ...supertypes]) {
-      for (var accessor in type.accessors) {
-        if (accessor.isSetter) {
-          var name = accessor.name;
-          accessorNames.add(name.substring(0, name.length - 1));
-        } else {
-          accessorNames.add(accessor.name);
+      for (var setter in type.setters) {
+        var name = setter.name;
+        if (name != null) {
+          name = name.substring(0, name.length - 1);
+        }
+      }
+      for (var getter in type.getters) {
+        var name = getter.name;
+        if (name != null) {
+          accessorNames.add(name);
         }
       }
     }
@@ -98,33 +102,53 @@ class TypeAdapterGenerator extends GeneratorForAnnotation<HiveType> {
       InterfaceElement interface, LibraryElement library) {
     var accessorNames = getAllAccessorNames(interface);
 
+    if (interface is EnumElement) {
+      // 处理枚举情况：直接获取枚举常量
+      var getters = <AdapterField>[];
+      for (var field in interface.fields.where((f) => f.isEnumConstant)) {
+        var hiveFieldAnn = getHiveFieldAnn(field);
+        if (hiveFieldAnn != null) {
+          getters.add(AdapterField(
+            hiveFieldAnn.index,
+            field.name ?? '',
+            field.type,
+            hiveFieldAnn.defaultValue,
+          ));
+        }
+      }
+      return [getters, []];
+    }
+
     var getters = <AdapterField>[];
     var setters = <AdapterField>[];
     for (var name in accessorNames) {
-      var getter = interface.lookUpGetter(name, library);
+      // old:  interface.lookUpGetter(name, library)
+      // element.augmented.lookUpGetter
+      var getter =
+          interface.lookUpGetter(name: name, library: library);
       if (getter != null) {
-        var getterAnn =
-            getHiveFieldAnn(getter.variable) ?? getHiveFieldAnn(getter);
+        var getterAnn = getHiveFieldAnn(getter);
         if (getterAnn != null) {
-          var field = getter.variable;
+          var field = getter;
           getters.add(AdapterField(
             getterAnn.index,
-            field.name,
+            field.name??'',
             field.type,
             getterAnn.defaultValue,
           ));
         }
       }
 
-      var setter = interface.lookUpSetter('$name=', library);
+      var setter =
+          interface.lookUpSetter(name: '$name=', library: library);
       if (setter != null) {
-        var setterAnn =
-            getHiveFieldAnn(setter.variable) ?? getHiveFieldAnn(setter);
+        var setterAnn = getHiveFieldAnn(setter);
         if (setterAnn != null) {
-          var field = setter.variable;
+          var field = setter;
+          final fieldName = (field.name??'').replaceFirst('=', ''); // 关键修复
           setters.add(AdapterField(
             setterAnn.index,
-            field.name,
+            fieldName,
             field.type,
             setterAnn.defaultValue,
           ));

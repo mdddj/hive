@@ -1,4 +1,16 @@
-## 3.0.5
+## 5.0.0
+
+- upgrade source_gen 3.0
+
+## 4.0.2
+
+- bug fixed
+
+## 4.0.0
+
+- Dependency upgrade `source_gen: ^2.0.0`
+
+## 3.0.6
 - bug fixed
 
 ## 3.0.1

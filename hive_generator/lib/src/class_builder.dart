@@ -1,5 +1,4 @@
 import 'dart:typed_data';
-
 import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/nullability_suffix.dart';
@@ -27,15 +26,15 @@ class ClassBuilder extends Builder {
 
   @override
   String buildRead() {
-    var constr =
-        interface.constructors.firstOrNullWhere((it) => it.name.isEmpty);
+    var constr = interface.constructors
+        .firstOrNullWhere((it) => it.name != null && it.name!.isEmpty);
     check(constr != null, 'Provide an unnamed constructor.');
 
     // The remaining fields to initialize.
     var fields = setters.toList();
 
     // Empty classes
-    if (constr!.parameters.isEmpty && fields.isEmpty) {
+    if (constr!.formalParameters.isEmpty && fields.isEmpty) {
       return 'return ${interface.name}();';
     }
 
@@ -49,7 +48,7 @@ class ClassBuilder extends Builder {
     return ${interface.name}(
     ''');
 
-    for (var param in constr.parameters) {
+    for (var param in constr.formalParameters) {
       var field = fields.firstOrNullWhere((it) => it.name == param.name);
       // Final fields
       field ??= getters.firstOrNullWhere((it) => it.name == param.name);
@@ -86,6 +85,7 @@ class ClassBuilder extends Builder {
   }
 
   String _value(DartType type, String variable, DartObject? defaultValue) {
+    // print("dart type:$type variable: $variable  default value :$defaultValue");
     var value = _cast(type, variable);
     if (defaultValue?.isNull != false) return value;
     return '$variable == null ? ${constantToString(defaultValue!)} : $value';
@@ -212,12 +212,12 @@ String _suffixFromType(DartType type) {
     return '';
   }
   if (type.nullabilitySuffix == NullabilitySuffix.question) {
-    return '?';
+    return '';
   }
   return '';
 }
 
 String _displayString(DartType e) {
   var suffix = _suffixFromType(e);
-  return '${e.getDisplayString(withNullability: false)}$suffix';
+  return '${e.getDisplayString()}$suffix';
 }
